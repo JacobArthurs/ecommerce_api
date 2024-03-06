@@ -2,3 +2,5 @@ Django
 djangorestframework
 mysqlclient
 python-dotenv
+graphene_django
+python-dateutil
