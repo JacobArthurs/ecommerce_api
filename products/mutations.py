@@ -3,6 +3,10 @@ from gql.types import OperationResult
 from .models import Product
 
 class CreateProduct(graphene.Mutation):
+    """
+    Creates a product based on the provided inputs. Validates input to ensure any provided cost or
+    supply values are positive if provided.
+    """
     class Arguments:
         name = graphene.String(required=True, description="The name of the product.")
         description = graphene.String(required=True, description="A detailed description of the product.")
