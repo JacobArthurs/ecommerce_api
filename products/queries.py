@@ -27,6 +27,7 @@ class ProductQuery(graphene.ObjectType):
         max_supply=graphene.Int(default_value=None, description="The maximum supply of products to retrieve."),
         start_date=graphene.Date(default_value=None, description="The start date of products to retrieve."),
         end_date=graphene.Date(default_value=None, description="The end date of products to retrieve."),
+        tags=graphene.List(graphene.Int, default_value=None, description="The IDs of the tags to filter by."),
         description="Search for products based on various criteria such as name, description, cost range, and supply range."
     )
     products_per_month = graphene.List(
@@ -79,7 +80,9 @@ class ProductQuery(graphene.ObjectType):
         if kwargs.get('end_date') is not None:
             end_datetime = datetime.combine(kwargs['end_date'], time.max)
             queryset = queryset.filter(created_at__lte=end_datetime)
-        
+        if kwargs.get('tags') is not None:
+            queryset = queryset.filter(tags__id__in=kwargs['tags'])
+
         return queryset
     
     def resolve_products_per_month(self, info, last_n_months):
