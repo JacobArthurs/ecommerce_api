@@ -1,11 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User
 from products.models import Product
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Review(models.Model):
     title = models.CharField(max_length=255)
     body = models.TextField()
-    rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 11)])
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')

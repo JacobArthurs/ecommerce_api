@@ -34,7 +34,7 @@ class ReviewQuery(graphene.ObjectType):
         """
         return Review.objects.all()
     
-    def review_by_id(self, info, id):
+    def resolve_review_by_id(self, info, id):
         """
         Retrieves a single review by its ID.
 
@@ -53,13 +53,13 @@ class ReviewQuery(graphene.ObjectType):
         queryset = Review.objects.filter(product_id=kwargs['product_id'])
 
         if kwargs.get('title'):
-            queryset = queryset.filter(name__icontains=kwargs['title'])
+            queryset = queryset.filter(title__icontains=kwargs['title'])
         if kwargs.get('body'):
-            queryset = queryset.filter(description__icontains=kwargs['body'])
+            queryset = queryset.filter(body__icontains=kwargs['body'])
         if kwargs.get('min_rating') is not None:
-            queryset = queryset.filter(cost__gte=kwargs['min_rating'])
+            queryset = queryset.filter(rating__gte=kwargs['min_rating'])
         if kwargs.get('max_rating') is not None:
-            queryset = queryset.filter(cost__lte=kwargs['max_rating'])
+            queryset = queryset.filter(rating__lte=kwargs['max_rating'])
         if kwargs.get('start_date') is not None:
             start_datetime = datetime.combine(kwargs['start_date'], time.min)
             queryset = queryset.filter(created_at__gte=start_datetime)
