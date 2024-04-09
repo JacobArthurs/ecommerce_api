@@ -38,6 +38,9 @@ class RegisterUser(graphene.Mutation):
             return RegisterUser(operation_result=OperationResult(success=False, message="An unexpected error occurred."))
         
 class MakeAdmin(graphene.Mutation):
+    """
+    Makes the specified user an admin.
+    """
     class Arguments:
         user_id = graphene.Int(required=True)
 
@@ -59,6 +62,9 @@ class MakeAdmin(graphene.Mutation):
 
 
 class RemoveAdmin(graphene.Mutation):
+    """
+    Removes the specified user from being an admin.
+    """
     class Arguments:
         user_id = graphene.Int(required=True)
 
