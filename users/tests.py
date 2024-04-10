@@ -1,4 +1,3 @@
-from mimetypes import types_map
 from django.contrib.auth.models import User, Group
 from graphene_django.utils.testing import GraphQLTestCase
 from common.utils import execute_mutation
