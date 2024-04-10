@@ -1,6 +1,7 @@
 import graphene
 from gql.types import OperationResult
 from .models import Product
+from graphql_jwt.decorators import user_passes_test
 
 class CreateProduct(graphene.Mutation):
     """
@@ -15,6 +16,7 @@ class CreateProduct(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     @staticmethod
     def mutate(root, info, name, description, cost, supply):
         if cost < 0 or supply < 0:
@@ -39,6 +41,7 @@ class UpdateProduct(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     @staticmethod
     def mutate(root, info, id, **kwargs):
         try:
@@ -66,6 +69,7 @@ class DeleteProduct(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     @staticmethod
     def mutate(root, info, id):
         try:

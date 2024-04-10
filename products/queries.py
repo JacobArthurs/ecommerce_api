@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime, time
 from .types import ProductType, ProductsPerMonthType
 from .models import Product
+from graphql_jwt.decorators import user_passes_test
 
 class ProductQuery(graphene.ObjectType):
     all_products = graphene.List(
@@ -85,6 +86,7 @@ class ProductQuery(graphene.ObjectType):
 
         return queryset
     
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     def resolve_products_per_month(self, info, last_n_months):
         """
         Calculates the number of products created each month for the last N months.

@@ -3,6 +3,7 @@ from gql.types import OperationResult
 from .models import Order, OrderItem
 from .types import CreateOrderInput
 from products.models import Product
+from graphql_jwt.decorators import login_required
 
 class CreateOrder(graphene.Mutation):
     """
@@ -14,6 +15,7 @@ class CreateOrder(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @login_required
     @staticmethod
     def mutate(root, info, order_items):
         product_ids = [int(item.product_id) for item in order_items]
@@ -47,6 +49,7 @@ class UpdateOrderItem(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @login_required
     @staticmethod
     def mutate(root, info, order_item_id, quantity):
         if quantity < 1:
@@ -76,6 +79,7 @@ class DeleteOrder(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @login_required
     @staticmethod
     def mutate(root, info, id):
         try:
@@ -96,6 +100,7 @@ class DeleteOrderItem(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @login_required
     @staticmethod
     def mutate(root, info, id):
         try:

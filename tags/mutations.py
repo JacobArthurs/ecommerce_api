@@ -2,6 +2,7 @@ import graphene
 from gql.types import OperationResult
 from .models import Tag
 from products.models import Product
+from graphql_jwt.decorators import user_passes_test
 
 class CreateTag(graphene.Mutation):
     """
@@ -14,6 +15,7 @@ class CreateTag(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     @staticmethod
     def mutate(root, info, name, description):
         tag = Tag(name=name, description=description)
@@ -33,6 +35,7 @@ class UpdateTag(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     @staticmethod
     def mutate(root, info, id, **kwargs):
         try:
@@ -55,6 +58,7 @@ class DeleteTag(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     @staticmethod
     def mutate(root, info, id):
         try:
@@ -72,6 +76,7 @@ class AddTagToProduct(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     @staticmethod
     def mutate(root, info, product_id, tag_id):
         """

@@ -5,7 +5,9 @@ from django.utils.timezone import now
 from dateutil.relativedelta import relativedelta
 from datetime import datetime, time
 from .types import OrderType, OrdersPerMonthType
-from .models import Order, OrderItem
+from .models import Order
+from graphql_jwt.decorators import user_passes_test
+from graphql_jwt.decorators import login_required
 
 class OrderQuery(graphene.ObjectType):
     all_orders = graphene.List(
@@ -30,6 +32,7 @@ class OrderQuery(graphene.ObjectType):
         last_n_months=graphene.Int(required=True, description="The number of months to include in the count, counting backwards from the current month."),
     )
 
+    @login_required
     def resolve_all_orders(self, info):
         """
         Fetches all order instances from the database.
@@ -39,6 +42,7 @@ class OrderQuery(graphene.ObjectType):
         """
         return Order.objects.all()
     
+    @login_required
     def resolve_order_by_id(self, info, id):
         """
         Retrieves a single Order by its ID.
@@ -48,6 +52,7 @@ class OrderQuery(graphene.ObjectType):
         """
         return Order.objects.filter(pk=id).first()
 
+    @login_required
     def resolve_search_orders(self, info, **kwargs):
         """
         Searches for orders matching the given criteria.
@@ -70,6 +75,7 @@ class OrderQuery(graphene.ObjectType):
 
         return queryset
     
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     def resolve_orders_per_month(self, info, last_n_months):
         """
         Calculates the number of orders created and the cost of orders created each month for the last N months.

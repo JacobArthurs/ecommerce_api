@@ -2,6 +2,7 @@ import graphene
 from gql.types import OperationResult
 from .models import Review
 from products.models import Product
+from graphql_jwt.decorators import login_required
 
 class CreateReview(graphene.Mutation):
     """
@@ -16,6 +17,7 @@ class CreateReview(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @login_required
     @staticmethod
     def mutate(root, info, title, body, rating, product_id):
         if rating < 1 or rating > 10:
@@ -44,6 +46,7 @@ class UpdateReview(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @login_required
     @staticmethod
     def mutate(root, info, id, **kwargs):
         try:
@@ -68,6 +71,7 @@ class DeleteReview(graphene.Mutation):
 
     operation_result = graphene.Field(OperationResult)
 
+    @login_required
     @staticmethod
     def mutate(root, info, id):
         try:

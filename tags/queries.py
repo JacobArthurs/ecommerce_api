@@ -2,6 +2,7 @@ import graphene
 from datetime import datetime, time
 from .types import TagType
 from .models import Tag
+from graphql_jwt.decorators import user_passes_test
 
 class TagQuery(graphene.ObjectType):
     all_tags = graphene.List(
@@ -22,6 +23,7 @@ class TagQuery(graphene.ObjectType):
         description="Search for tags based on various criteria such as title, and description."
     )
 
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     def resolve_all_tags(self, info):
         """
         Fetches all tags from the database.
@@ -31,6 +33,7 @@ class TagQuery(graphene.ObjectType):
         """
         return Tag.objects.all()
     
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     def resove_tag_by_id(self, info, id):
         """
         Retrieves a single tag by its ID.
@@ -40,6 +43,7 @@ class TagQuery(graphene.ObjectType):
         """
         return Tag.objects.filter(pk=id).first()
 
+    @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     def resolve_search_tags(self, info, **kwargs):
         """
         Searches for tags matching the given criteria.
