@@ -40,7 +40,9 @@ class OrderQuery(graphene.ObjectType):
         Returns:
             List of all Order instances.
         """
-        return Order.objects.all()
+        if info.context.user.groups.filter(name='admin').exists():
+            return Order.objects.all()
+        return Order.objects.filter(user=info.context.user)
     
     @login_required
     def resolve_order_by_id(self, info, id):
@@ -50,7 +52,11 @@ class OrderQuery(graphene.ObjectType):
         Returns:
             A Order if found, None otherwise.
         """
-        return Order.objects.filter(pk=id).first()
+        order = Order.objects.filter(pk=id).first()
+
+        if order and order.user == info.context.user or info.context.user.groups.filter(name='admin').exists():
+            return order
+        return None
 
     @login_required
     def resolve_search_orders(self, info, **kwargs):
@@ -60,7 +66,10 @@ class OrderQuery(graphene.ObjectType):
         Returns:
             List of Order instances matching the search criteria.
         """
-        queryset = Order.objects.all()
+        if info.context.user.groups.filter(name='admin').exists():
+            queryset = Order.objects.all()
+        else:
+            queryset = Order.objects.all().filter(user=info.context.user)
 
         if kwargs.get('min_cost') is not None:
             queryset = queryset.filter(total_cost__gte=kwargs['min_cost'])

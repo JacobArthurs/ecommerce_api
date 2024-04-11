@@ -24,7 +24,7 @@ class CreateOrder(graphene.Mutation):
         if len(products) != len(set(product_ids)):
             return CreateOrder(operation_result=OperationResult(success=False, message="One or more products not found."))
 
-        order = Order(total_cost=sum(products[int(item.product_id)].cost * item.quantity for item in order_items))
+        order = Order(total_cost=sum(products[int(item.product_id)].cost * item.quantity for item in order_items), user=info.context.user)
         order.save()
 
         OrderItem.objects.bulk_create([
@@ -60,6 +60,9 @@ class UpdateOrderItem(graphene.Mutation):
         except Order.DoesNotExist:
             return UpdateOrderItem(operation_result=OperationResult(success=False, message="Order not found."))
         
+        if order_item.order.user != info.context.user and not info.context.user.groups.filter(name='admin').exists():
+            return UpdateOrderItem(operation_result=OperationResult(success=False, message="You can only edit your own orders."))
+
         order_item.quantity = quantity
         order_item.cost = order_item.product.cost
         order_item.save()
@@ -87,6 +90,9 @@ class DeleteOrder(graphene.Mutation):
         except Order.DoesNotExist:
             return DeleteOrder(operation_result=OperationResult(success=False, message="Order not found."))
         
+        if order.user != info.context.user  and not info.context.user.groups.filter(name='admin').exists():
+            return DeleteOrder(operation_result=OperationResult(success=False, message="You can only delete your own orders."))
+
         order.delete()
 
         return DeleteOrder(operation_result=OperationResult(success=True, message="Order deleted successfully."))
@@ -108,6 +114,9 @@ class DeleteOrderItem(graphene.Mutation):
         except Order.DoesNotExist:
             return DeleteOrderItem(operation_result=OperationResult(success=False, message="Order item not found."))
         
+        if order_item.order.user != info.context.user and not info.context.user.groups.filter(name='admin').exists():
+            return DeleteOrderItem(operation_result=OperationResult(success=False, message="You can only delete your own orders."))
+
         order_item.delete()
 
         order = order_item.order
