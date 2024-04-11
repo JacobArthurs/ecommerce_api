@@ -1,6 +1,7 @@
 from django.db import models
 from products.models import Product
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import User
 
 class Review(models.Model):
     title = models.CharField(max_length=255)
@@ -9,6 +10,7 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
 
     def __str__(self):
         return self.title
