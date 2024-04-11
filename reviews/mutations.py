@@ -28,7 +28,7 @@ class CreateReview(graphene.Mutation):
         except Product.DoesNotExist:
             return CreateReview(operation_result=OperationResult(success=False, message="Product not found."))
 
-        review = Review(title=title, body=body, rating=rating, product=product)
+        review = Review(title=title, body=body, rating=rating, product=product, user=info.context.user)
         review.save()
 
         return CreateReview(operation_result=OperationResult(success=True, message="Review created successfully."))
@@ -53,6 +53,9 @@ class UpdateReview(graphene.Mutation):
             review = Review.objects.get(pk=id)
         except Review.DoesNotExist:
             return UpdateReview(operation_result=OperationResult(success=False, message="Review not found."))
+
+        if review.user != info.context.user and not info.context.user.groups.filter(name='admin').exists():
+            return UpdateReview(operation_result=OperationResult(success=False, message="You can only update your own reviews."))
 
         for field, value in kwargs.items():
             if field == 'rating' and (value < 1 or value > 10):
@@ -79,6 +82,9 @@ class DeleteReview(graphene.Mutation):
         except Review.DoesNotExist:
             return DeleteReview(operation_result=OperationResult(success=False, message="Review not found."))
         
+        if review.user != info.context.user and not info.context.user.groups.filter(name='admin').exists():
+            return DeleteReview(operation_result=OperationResult(success=False, message="You can only delete your own reviews."))
+
         review.delete()
         return DeleteReview(operation_result=OperationResult(success=True, message="Review deleted successfully."))
 
