@@ -34,7 +34,7 @@ class TagQuery(graphene.ObjectType):
         return Tag.objects.all()
     
     @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
-    def resove_tag_by_id(self, info, id):
+    def resolve_tag_by_id(self, info, id):
         """
         Retrieves a single tag by its ID.
 
@@ -53,7 +53,7 @@ class TagQuery(graphene.ObjectType):
         """
         queryset = Tag.objects.all()
 
-        if kwargs.get('nane'):
+        if kwargs.get('name'):
             queryset = queryset.filter(name__icontains=kwargs['name'])
         if kwargs.get('tag_description'):
             queryset = queryset.filter(description__icontains=kwargs['tag_description'])

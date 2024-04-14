@@ -92,7 +92,6 @@ class AddTagToProduct(graphene.Mutation):
         except Tag.DoesNotExist:
             return AddTagToProduct(operation_result=OperationResult(success=False, message="Tag not found."))
 
-        # Add the tag to the product
         product.tags.add(tag)
         
         return AddTagToProduct(operation_result=OperationResult(success=True, message="Tag added to product successfully."))
