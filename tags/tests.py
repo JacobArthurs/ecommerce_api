@@ -234,6 +234,22 @@ class TagQueryTests(GraphQLTestCase):
         self.assertEqual(response.json()['data']['tagById']['name'], self.tag1.name)
         self.assertEqual(response.json()['data']['tagById']['description'], self.tag1.description)
 
+    def test_tag_by_id_does_not_found(self):
+        query = f'''
+        query {{
+            tagById(id: 999999) {{
+                id
+                name
+                description
+            }}
+        }}
+        '''
+
+        response = self.query(query)
+
+        self.assertResponseNoErrors(response)
+        self.assertIsNone(response.json()['data']['tagById'])
+
     def test_tag_by_id_permission_denied(self):
         self.client.force_login(self.user)
         query = f'''
