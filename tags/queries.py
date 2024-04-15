@@ -3,6 +3,7 @@ from datetime import datetime, time
 from .types import TagType
 from .models import Tag
 from graphql_jwt.decorators import user_passes_test
+from django.utils import timezone
 
 class TagQuery(graphene.ObjectType):
     all_tags = graphene.List(
@@ -58,10 +59,10 @@ class TagQuery(graphene.ObjectType):
         if kwargs.get('tag_description'):
             queryset = queryset.filter(description__icontains=kwargs['tag_description'])
         if kwargs.get('start_date') is not None:
-            start_datetime = datetime.combine(kwargs['start_date'], time.min)
+            start_datetime = timezone.make_aware(datetime.combine(kwargs['start_date'], time.min), timezone.get_default_timezone())
             queryset = queryset.filter(created_at__gte=start_datetime)
         if kwargs.get('end_date') is not None:
-            end_datetime = datetime.combine(kwargs['end_date'], time.max)
+            end_datetime = timezone.make_aware(datetime.combine(kwargs['end_date'], time.max), timezone.get_default_timezone())
             queryset = queryset.filter(created_at__lte=end_datetime)
         
         return queryset

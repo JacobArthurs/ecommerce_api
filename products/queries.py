@@ -7,6 +7,7 @@ from datetime import datetime, time
 from .types import ProductType, ProductsPerMonthType
 from .models import Product
 from graphql_jwt.decorators import user_passes_test
+from django.utils import timezone
 
 class ProductQuery(graphene.ObjectType):
     all_products = graphene.List(
@@ -76,10 +77,10 @@ class ProductQuery(graphene.ObjectType):
         if kwargs.get('max_supply') is not None:
             queryset = queryset.filter(supply__lte=kwargs['max_supply'])
         if kwargs.get('start_date') is not None:
-            start_datetime = datetime.combine(kwargs['start_date'], time.min)
+            start_datetime = timezone.make_aware(datetime.combine(kwargs['start_date'], time.min), timezone.get_default_timezone())
             queryset = queryset.filter(created_at__gte=start_datetime)
         if kwargs.get('end_date') is not None:
-            end_datetime = datetime.combine(kwargs['end_date'], time.max)
+            end_datetime = timezone.make_aware(datetime.combine(kwargs['end_date'], time.max), timezone.get_default_timezone())
             queryset = queryset.filter(created_at__lte=end_datetime)
         if kwargs.get('tags') is not None:
             queryset = queryset.filter(tags__id__in=kwargs['tags'])

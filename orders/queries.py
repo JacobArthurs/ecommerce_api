@@ -8,6 +8,7 @@ from .types import OrderType, OrdersPerMonthType
 from .models import Order
 from graphql_jwt.decorators import user_passes_test
 from graphql_jwt.decorators import login_required
+from django.utils import timezone
 
 class OrderQuery(graphene.ObjectType):
     all_orders = graphene.List(
@@ -76,10 +77,10 @@ class OrderQuery(graphene.ObjectType):
         if kwargs.get('max_cost') is not None:
             queryset = queryset.filter(total_cost__lte=kwargs['max_cost'])
         if kwargs.get('start_date') is not None:
-            start_datetime = datetime.combine(kwargs['start_date'], time.min)
+            start_datetime = timezone.make_aware(datetime.combine(kwargs['start_date'], time.min), timezone.get_default_timezone())
             queryset = queryset.filter(created_at__gte=start_datetime)
         if kwargs.get('end_date') is not None:
-            end_datetime = datetime.combine(kwargs['end_date'], time.max)
+            end_datetime = timezone.make_aware(datetime.combine(kwargs['end_date'], time.max), timezone.get_default_timezone())
             queryset = queryset.filter(created_at__lte=end_datetime)
 
         return queryset

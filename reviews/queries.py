@@ -2,6 +2,7 @@ import graphene
 from datetime import datetime, time
 from .types import ReviewType
 from .models import Review
+from django.utils import timezone
 
 class ReviewQuery(graphene.ObjectType):
     all_reviews = graphene.List(
@@ -61,10 +62,10 @@ class ReviewQuery(graphene.ObjectType):
         if kwargs.get('max_rating') is not None:
             queryset = queryset.filter(rating__lte=kwargs['max_rating'])
         if kwargs.get('start_date') is not None:
-            start_datetime = datetime.combine(kwargs['start_date'], time.min)
+            start_datetime = timezone.make_aware(datetime.combine(kwargs['start_date'], time.min), timezone.get_default_timezone())
             queryset = queryset.filter(created_at__gte=start_datetime)
         if kwargs.get('end_date') is not None:
-            end_datetime = datetime.combine(kwargs['end_date'], time.max)
+            end_datetime = timezone.make_aware(datetime.combine(kwargs['end_date'], time.max), timezone.get_default_timezone())
             queryset = queryset.filter(created_at__lte=end_datetime)
         
         return queryset
