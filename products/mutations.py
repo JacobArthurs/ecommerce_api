@@ -19,8 +19,14 @@ class CreateProduct(graphene.Mutation):
     @user_passes_test(lambda user: user.groups.filter(name='admin').exists())
     @staticmethod
     def mutate(root, info, name, description, cost, supply):
-        if cost < 0 or supply < 0:
-            return CreateProduct(operation_result=OperationResult(success=False, message="Cost and supply must be positive values."))
+        if cost < 0:
+            return CreateProduct(operation_result=OperationResult(success=False, message="Cost must be a positive value."))
+        if supply < 0:
+            return CreateProduct(operation_result=OperationResult(success=False, message="Supply must be a positive value."))
+        if not name:
+            return CreateProduct(operation_result=OperationResult(success=False, message="Name cannot be empty."))
+        if not description:
+            return CreateProduct(operation_result=OperationResult(success=False, message="Description cannot be empty."))
 
         product = Product(name=name, description=description, cost=cost, supply=supply)
         product.save()
@@ -51,8 +57,14 @@ class UpdateProduct(graphene.Mutation):
         
         for field, value in kwargs.items():
             if value is not None:
-                if field in ['cost', 'supply'] and value < 0:
-                    return UpdateProduct(operation_result=OperationResult(success=False, message=f"{field.capitalize()} must be positive."))
+                if field == 'cost' and value < 0:
+                    return UpdateProduct(operation_result=OperationResult(success=False, message="Cost must be a positive value."))
+                if field == 'supply' and value < 0:
+                    return UpdateProduct(operation_result=OperationResult(success=False, message="Supply must be a positive value."))
+                if field == 'name' and not value:
+                    return UpdateProduct(operation_result=OperationResult(success=False, message="Name cannot be empty."))
+                if field == 'description' and not value:
+                    return UpdateProduct(operation_result=OperationResult(success=False, message="Description cannot be empty."))
                 setattr(product, field, value)
         
         product.save()
