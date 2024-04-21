@@ -1,4 +1,3 @@
-from django.utils import timezone
 from .models import Product
 from graphene_django.utils.testing import GraphQLTestCase
 from common.utils import execute_mutation
