@@ -32,7 +32,7 @@ class OrdersPerMonthType(graphene.ObjectType):
     """
     month = graphene.String(description="The name of the month in 'Month YYYY' format.")
     order_count = graphene.Int(description="The count of orders created in that month.")
-    order_cost = graphene.Int(description="The total cost of orders in that month.")
+    order_cost = graphene.Float(description="The total cost of orders in that month.")
 
 class CreateOrderInput(graphene.InputObjectType):
     """

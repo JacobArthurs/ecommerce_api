@@ -23,6 +23,9 @@ class CreateOrder(graphene.Mutation):
 
         if len(products) != len(set(product_ids)):
             return CreateOrder(operation_result=OperationResult(success=False, message="One or more products not found."))
+        
+        if any(item.quantity < 1 for item in order_items):
+            return CreateOrder(operation_result=OperationResult(success=False, message="One or more quantities are less than 1."))
 
         order = Order(total_cost=sum(products[int(item.product_id)].cost * item.quantity for item in order_items), user=info.context.user)
         order.save()
@@ -44,21 +47,21 @@ class UpdateOrderItem(graphene.Mutation):
     The price will be set to the product's current price.
     """
     class Arguments:
-        order_item_id = graphene.ID(required=True, description="The ID of the order item to update, required.")
+        id = graphene.ID(required=True, description="The ID of the order item to update, required.")
         quantity = graphene.Int(required=True, description="The quantity of the order item, required.")
 
     operation_result = graphene.Field(OperationResult)
 
     @login_required
     @staticmethod
-    def mutate(root, info, order_item_id, quantity):
+    def mutate(root, info, id, quantity):
         if quantity < 1:
-            return UpdateOrderItem(operation_result=OperationResult(success=False, message="Quantity must be greater than 0."))
+            return UpdateOrderItem(operation_result=OperationResult(success=False, message="One or more quantities are less than 1."))
 
         try:
-            order_item = OrderItem.objects.get(pk=order_item_id)
-        except Order.DoesNotExist:
-            return UpdateOrderItem(operation_result=OperationResult(success=False, message="Order not found."))
+            order_item = OrderItem.objects.get(pk=id)
+        except OrderItem.DoesNotExist:
+            return UpdateOrderItem(operation_result=OperationResult(success=False, message="Order item not found."))
         
         if order_item.order.user != info.context.user and not info.context.user.groups.filter(name='admin').exists():
             return UpdateOrderItem(operation_result=OperationResult(success=False, message="You can only edit your own orders."))
@@ -111,7 +114,7 @@ class DeleteOrderItem(graphene.Mutation):
     def mutate(root, info, id):
         try:
             order_item = OrderItem.objects.get(pk=id)
-        except Order.DoesNotExist:
+        except OrderItem.DoesNotExist:
             return DeleteOrderItem(operation_result=OperationResult(success=False, message="Order item not found."))
         
         if order_item.order.user != info.context.user and not info.context.user.groups.filter(name='admin').exists():
