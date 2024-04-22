@@ -126,6 +126,7 @@ GRAPHQL_JWT = {
     "JWT_VERIFY_EXPIRATION": True,
     "JWT_PAYLOAD_HANDLER": "common.utils.jwt_payload_handler",
     "JWT_ISSUER": "ecommerce.jacobarthurs.com",
+    "JWT_AUDIENCE": "ecommerce.jacobarthurs.com",
 }
 
 # GraphQL
