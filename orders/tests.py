@@ -1,6 +1,5 @@
 from django.utils import timezone
 
-from .types import CreateOrderInput
 from products.models import Product
 from .models import Order, OrderItem
 from graphene_django.utils.testing import GraphQLTestCase
